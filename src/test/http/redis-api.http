@@ -1,0 +1,15 @@
+POST http://localhost:8080/api/v2/records
+Content-Type: application/json
+
+{
+  "name": "aasasdd",
+  "attempt1": 1,
+  "attempt2": 1,
+  "attempt3": 1
+}
+
+###
+GET http://localhost:8080/api/v2/records
+
+###
+GET http://localhost:8080/api/v2/records/me?name=박준호12

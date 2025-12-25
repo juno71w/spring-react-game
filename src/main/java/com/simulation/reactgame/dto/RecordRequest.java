@@ -1,4 +1,4 @@
-package com.simulation.dto;
+package com.simulation.reactgame.dto;
 
 import jakarta.persistence.Column;
 import lombok.Builder;
