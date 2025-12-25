@@ -8,6 +8,7 @@ import com.simulation.reactgame.RedisRecordService;
 import com.simulation.reactgame.entity.Record;
 import com.simulation.reactgame.infra.RedisRecordKey;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Slf4j
 @Service
 @Qualifier("redis")
 @RequiredArgsConstructor
@@ -97,9 +99,10 @@ public class RecordServiceRedisImpl implements RecordService, RedisRecordService
 
         redisTemplate.delete(RECORD_KEY);
 
+        log.info("redis rebuildRanking");
         while (true) {
             Page<Record> result = recordRepository.findAll(PageRequest.of(page, size));
-
+            log.info("redis warm page: {}", page);
             if (result.isEmpty()) break;
 
             redisTemplate.executePipelined((RedisCallback<Object>) connection -> {

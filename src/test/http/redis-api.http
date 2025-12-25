@@ -1,15 +1,16 @@
+### 랭킹 시스템에 내 기록 등록하기
 POST http://localhost:8080/api/v2/records
 Content-Type: application/json
 
 {
-  "name": "aasasdd",
+  "name": "aasasdd123",
   "attempt1": 1,
   "attempt2": 1,
   "attempt3": 1
 }
 
-###
+### 상위 10명의 랭킹 기록 확인하기
 GET http://localhost:8080/api/v2/records
 
-###
-GET http://localhost:8080/api/v2/records/me?name=박준호12
+### 내 이름으로 랭킹 조회 + 랭킹 근처 10명 조회
+GET http://localhost:8080/api/v2/records/me?name=User_1

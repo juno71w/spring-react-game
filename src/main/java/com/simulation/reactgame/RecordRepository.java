@@ -25,9 +25,15 @@ public interface RecordRepository extends JpaRepository<com.simulation.reactgame
     
     UNION ALL
     
-    (SELECT * FROM records 
-     WHERE average_time < (SELECT average_time FROM records WHERE name = :name)
-     ORDER BY average_time DESC LIMIT 5)
+    (SELECT *
+	FROM (
+	  SELECT *
+	  FROM records
+	  WHERE average_time < (SELECT average_time FROM records WHERE name = "박준호")
+	  ORDER BY average_time ASC
+	  LIMIT 5
+	) t
+	ORDER BY average_time DESC)
     
     ORDER BY average_time ASC
     """, nativeQuery = true)

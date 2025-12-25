@@ -34,5 +34,6 @@ public class RankingWarmUp {
             log.info("redis warm up start");
             recordService.rebuildRanking();
         }
+        log.info("redis warm up finish");
     }
 }

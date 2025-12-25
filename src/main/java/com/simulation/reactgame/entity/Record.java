@@ -11,7 +11,12 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "records")
+@Table(
+        name = "records",
+        indexes = {
+                @Index(name = "idx_average_time", columnList = "average_time")
+        }
+)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Record extends BaseTimeEntity {
 
