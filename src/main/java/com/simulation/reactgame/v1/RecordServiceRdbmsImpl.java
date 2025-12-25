@@ -1,0 +1,69 @@
+package com.simulation.reactgame.v1;
+
+import com.simulation.reactgame.dto.RecordRequest;
+import com.simulation.reactgame.dto.RecordResponse;
+import com.simulation.reactgame.RecordRepository;
+import com.simulation.reactgame.RecordService;
+import com.simulation.reactgame.entity.Record;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+@Service
+@Qualifier("rdbms")
+@RequiredArgsConstructor
+public class RecordServiceRdbmsImpl implements RecordService {
+
+    private final RecordRepository recordRepository;
+
+    @Override
+    public RecordResponse.RankDto registerRecord(RecordRequest.RegisterDto registerDto) {
+        Record record = toEntity(registerDto);
+        Record saved = recordRepository.save(record);
+
+        return toResponse(saved);
+    }
+
+    @Override
+    public RecordResponse.RankList getRecords() {
+        return RecordResponse.RankList.builder()
+                .rankList(
+                        recordRepository.findTop10ByOrderByAverageTime()
+                                .stream()
+                                .map(this::toResponse)
+                                .toList()
+                )
+                .build();
+    }
+
+    @Override
+    public RecordResponse.RankList getMyRecords(String name) {
+        return RecordResponse.RankList.builder()
+                .rankList(
+                        recordRepository.findRecordNearByMe10(name)
+                                .stream()
+                                .map(this::toResponse)
+                                .toList()
+                )
+                .build();
+    }
+
+    private Record toEntity(RecordRequest.RegisterDto registerDto) {
+        return Record.builder()
+                .name(registerDto.getName())
+                .attempt1(registerDto.getAttempt1())
+                .attempt2(registerDto.getAttempt2())
+                .attempt3(registerDto.getAttempt3())
+                .build();
+    }
+
+    private RecordResponse.RankDto toResponse(Record record) {
+        return RecordResponse.RankDto.builder()
+                .id(record.getId())
+                .name(record.getName())
+                .score(record.getAverageTime())
+                .build();
+    }
+
+}
+

@@ -1,0 +1,42 @@
+package com.simulation.reactgame.v2;
+
+import com.simulation.reactgame.dto.RecordRequest;
+import com.simulation.reactgame.dto.RecordResponse;
+import com.simulation.reactgame.RecordService;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/v2/records")
+public class RecordControllerV2 {
+
+    private final RecordService recordService;
+
+    public RecordControllerV2(@Qualifier("redis") RecordService recordService) {
+        this.recordService = recordService;
+    }
+
+    @PostMapping
+    public ResponseEntity<RecordResponse.RankDto> registerRecord(
+            @RequestBody RecordRequest.RegisterDto registerDto
+    ) {
+        RecordResponse.RankDto rankDto = recordService.registerRecord(registerDto);
+        return ResponseEntity.ofNullable(rankDto);
+
+    }
+
+    @GetMapping
+    public ResponseEntity<RecordResponse.RankList> getRecords() {
+        RecordResponse.RankList list = recordService.getRecords();
+        return ResponseEntity.ofNullable(list);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<RecordResponse.RankList> getMyRecords(
+            @RequestParam String name
+    ) {
+        RecordResponse.RankList list = recordService.getMyRecords(name);
+        return ResponseEntity.ofNullable(list);
+    }
+}
