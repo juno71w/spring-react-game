@@ -22,7 +22,7 @@ public class RecordServiceRdbmsImpl implements RecordService {
     private final RecordRepository recordRepository;
 
     @Override
-    public RecordRankingView registerRecord(RecordRequest.RegisterDto registerDto) {
+    public RecordResponse.RankDto registerRecord(RecordRequest.RegisterDto registerDto) {
         Record record = toEntity(registerDto);
         Record saved = recordRepository.save(record);
 

@@ -19,7 +19,7 @@ public interface RecordRepository extends JpaRepository<com.simulation.reactgame
                 id,
                 name,
                 average_time,
-                RANK() OVER (ORDER BY average_time ASC) AS `rank`
+                RANK() OVER (ORDER BY average_time ASC, created_at DESC) AS `rank`
             FROM records
             ORDER BY average_time ASC
             LIMIT 10
@@ -27,51 +27,33 @@ public interface RecordRepository extends JpaRepository<com.simulation.reactgame
     List<RecordRankingView> findTop10Ranking();
 
     @Query(value = """
-            SELECT *,
-                   RANK() OVER (ORDER BY average_time ASC) AS `rank`
+            SELECT sub.id, sub.name, sub.average_time, sub.`rank`
             FROM (
-                (SELECT * FROM records
+                SELECT id, name, average_time, RANK() OVER (ORDER BY average_time ASC, created_at DESC) as `rank`
+                FROM records
+            ) sub
+            JOIN (
+                (SELECT id FROM records
                  WHERE average_time > (SELECT average_time FROM records WHERE name = :name)
                  ORDER BY average_time ASC LIMIT 5)
-                UNION ALL
-
-                (SELECT * FROM records
+                UNION
+                (SELECT id FROM records
                  WHERE name = :name)
-
-                UNION ALL
-
-                (SELECT *
-            	FROM (
-            	  SELECT *
-            	  FROM records
-            	  WHERE average_time < (SELECT average_time FROM records WHERE name = "박준호")
-            	  ORDER BY average_time ASC
-            	  LIMIT 5
-            	) t
-            	ORDER BY average_time DESC)
-
-                ORDER BY average_time ASC
-            ) u
+                UNION
+                (SELECT id FROM records
+                 WHERE average_time < (SELECT average_time FROM records WHERE name = :name)
+                 ORDER BY average_time DESC LIMIT 5)
+            ) targets ON sub.id = targets.id
+            ORDER BY sub.average_time ASC
             """, nativeQuery = true)
     List<RecordRankingView> findRecordNearByMe10(@Param("name") String name);
 
     List<Record> findRecordsByNameIn(Collection<String> names);
 
     @Query(value = """
-            SELECT
-                id,
-                name,
-                average_time,
-                RANK() OVER (ORDER BY average_time ASC) AS `rank`
-            FROM records
-            WHERE id = :recordId
-            """, nativeQuery = true)
-    RecordResponse.RankDto findRankByRecordId(@Param("recordId") Long recordId);
-
-    @Query(value = """
             SELECT sub.id, sub.name, sub.average_time, sub.`rank`
             FROM (
-                SELECT id, name, average_time, RANK() OVER (ORDER BY average_time ASC) as `rank`
+                SELECT id, name, average_time, RANK() OVER (ORDER BY average_time ASC, created_at DESC) as `rank`
                 FROM records
             ) sub
             WHERE sub.id = :recordId

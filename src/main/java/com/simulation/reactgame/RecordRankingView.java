@@ -4,5 +4,5 @@ public interface RecordRankingView {
     Long getId();
     String getName();
     float getAverageTime();
-    Integer getRank();
+    Long getRank();
 }

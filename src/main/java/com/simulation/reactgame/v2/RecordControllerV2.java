@@ -19,10 +19,10 @@ public class RecordControllerV2 {
     }
 
     @PostMapping
-    public ResponseEntity<RecordRankingView> registerRecord(
+    public ResponseEntity<RecordResponse.RankDto> registerRecord(
             @RequestBody RecordRequest.RegisterDto registerDto
     ) {
-        RecordRankingView view = recordService.registerRecord(registerDto);
+        RecordResponse.RankDto view = recordService.registerRecord(registerDto);
         return ResponseEntity.ofNullable(view);
     }
 

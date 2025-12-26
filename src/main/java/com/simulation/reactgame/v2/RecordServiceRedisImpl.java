@@ -1,5 +1,8 @@
 package com.simulation.reactgame.v2;
 
+import com.simulation.global.error.CustomException;
+import com.simulation.global.error.ErrorCode;
+import com.simulation.reactgame.RecordRankingView;
 import com.simulation.reactgame.dto.RecordRequest;
 import com.simulation.reactgame.dto.RecordResponse;
 import com.simulation.reactgame.RecordRepository;
@@ -17,11 +20,13 @@ import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 @Slf4j
 @Service
+@Transactional
 @Qualifier("redis")
 @RequiredArgsConstructor
 public class RecordServiceRedisImpl implements RecordService, RedisRecordService {
@@ -31,14 +36,13 @@ public class RecordServiceRedisImpl implements RecordService, RedisRecordService
     private static final String RECORD_KEY = RedisRecordKey.RECORD_KEY;
 
     @Override
-    public com.simulation.reactgame.RecordRankingView registerRecord(RecordRequest.RegisterDto registerDto) {
+    public RecordResponse.RankDto registerRecord(RecordRequest.RegisterDto registerDto) {
         Record saved = recordRepository.save(toEntity(registerDto));
 
         redisTemplate.opsForZSet().add(RECORD_KEY, saved.getName(), saved.getAverageTime());
+        Long rank = redisTemplate.opsForZSet().rank(RECORD_KEY, saved.getName());
 
-        return recordRepository.findRankingById(saved.getId())
-                .orElseThrow(() -> new com.simulation.global.error.CustomException(
-                        com.simulation.global.error.ErrorCode.ENTITY_NOT_FOUND));
+        return toResponse(saved, rank);
     }
 
     @Override
@@ -51,7 +55,7 @@ public class RecordServiceRedisImpl implements RecordService, RedisRecordService
                 .rankList(
                         recordRepository.findRecordsByNameIn(nameList).stream()
                                 .sorted(Comparator.comparingDouble(Record::getAverageTime))
-                                .map(this::toResponse)
+                                .map(record -> toResponse(record, 0))
                                 .toList())
                 .build();
     }
@@ -72,7 +76,7 @@ public class RecordServiceRedisImpl implements RecordService, RedisRecordService
 
         return RecordResponse.RankList.builder()
                 .rankList(recordsByNameIn.stream()
-                        .map(this::toResponse)
+                        .map(record -> toResponse(record, 0))
                         .toList())
                 .build();
     }
@@ -86,7 +90,7 @@ public class RecordServiceRedisImpl implements RecordService, RedisRecordService
                 .build();
     }
 
-    private RecordResponse.RankDto toResponse(Record record) {
+    private RecordResponse.RankDto toResponse(Record record, long rank) {
         return RecordResponse.RankDto.builder()
                 .id(record.getId())
                 .name(record.getName())
