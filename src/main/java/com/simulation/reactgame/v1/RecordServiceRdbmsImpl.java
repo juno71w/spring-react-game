@@ -28,8 +28,8 @@ public class RecordServiceRdbmsImpl implements RecordService {
 
         recordRepository.flush();
 
-        return recordRepository.findRankingById(saved.getId())
-                .orElseThrow(() -> new CustomException(ErrorCode.ENTITY_NOT_FOUND));
+        return toResponse(recordRepository.findRankingById(saved.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.ENTITY_NOT_FOUND)));
     }
 
     @Override
