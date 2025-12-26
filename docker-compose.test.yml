@@ -1,0 +1,8 @@
+services:
+  k6:
+    image: grafana/k6
+    volumes:
+      - ./k6:/scripts
+    environment:
+      - K6_OUT=influxdb=http://3.39.50.141:8086/k6
+
