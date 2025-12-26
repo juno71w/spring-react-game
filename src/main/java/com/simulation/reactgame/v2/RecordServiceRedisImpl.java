@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -105,22 +106,27 @@ public class RecordServiceRedisImpl implements RecordService, RedisRecordService
             log.info("redis warm page: {}", page);
             if (result.isEmpty()) break;
 
-            redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
-                byte[] key = serialize(RECORD_KEY);
-
-                for (Record record : result) {
-                    connection.zAdd(
-                            key,
-                            record.getAverageTime(),
-                            serialize(record.getName())
-                    );
-                }
-                return null;
-            });
+            redisTemplate.executePipelined(getObjectRedisCallback(result));
 
             page++;
         }
     }
+
+    private RedisCallback<Object> getObjectRedisCallback(Page<Record> result) {
+        return connection -> {
+            byte[] key = serialize(RECORD_KEY);
+
+            for (Record record : result) {
+                connection.zAdd(
+                        key,
+                        record.getAverageTime(),
+                        serialize(record.getName())
+                );
+            }
+            return null;
+        };
+    }
+
 
     private byte[] serialize(String key) {
         return redisTemplate.getStringSerializer().serialize(key);

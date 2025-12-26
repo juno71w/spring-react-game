@@ -19,5 +19,6 @@ public class RecordResponse {
         private Long id;
         private String name;
         private float score;
+        private int rank;
     }
 }

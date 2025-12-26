@@ -1,5 +1,6 @@
 package com.simulation.reactgame.v1;
 
+import com.simulation.reactgame.RecordRankingView;
 import com.simulation.reactgame.dto.RecordRequest;
 import com.simulation.reactgame.dto.RecordResponse;
 import com.simulation.reactgame.RecordRepository;
@@ -8,8 +9,10 @@ import com.simulation.reactgame.entity.Record;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @Qualifier("rdbms")
 @RequiredArgsConstructor
 public class RecordServiceRdbmsImpl implements RecordService {
@@ -21,6 +24,9 @@ public class RecordServiceRdbmsImpl implements RecordService {
         Record record = toEntity(registerDto);
         Record saved = recordRepository.save(record);
 
+        recordRepository.flush();
+
+
         return toResponse(saved);
     }
 
@@ -28,7 +34,7 @@ public class RecordServiceRdbmsImpl implements RecordService {
     public RecordResponse.RankList getRecords() {
         return RecordResponse.RankList.builder()
                 .rankList(
-                        recordRepository.findTop10ByOrderByAverageTime()
+                        recordRepository.findTop10Ranking()
                                 .stream()
                                 .map(this::toResponse)
                                 .toList()
@@ -57,11 +63,12 @@ public class RecordServiceRdbmsImpl implements RecordService {
                 .build();
     }
 
-    private RecordResponse.RankDto toResponse(Record record) {
+    private RecordResponse.RankDto toResponse(RecordRankingView record) {
         return RecordResponse.RankDto.builder()
                 .id(record.getId())
                 .name(record.getName())
                 .score(record.getAverageTime())
+                .rank(record.getRank())
                 .build();
     }
 
