@@ -10,10 +10,13 @@ import com.simulation.reactgame.service.RecordService;
 import com.simulation.reactgame.entity.Record;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
+
+import static com.simulation.reactgame.infra.RedisRecordKey.RECORD_KEY;
 
 @Service
 @Transactional
@@ -22,6 +25,7 @@ import java.util.Comparator;
 public class RecordServiceRdbmsImpl implements RecordService {
 
     private final RecordRepository recordRepository;
+    private final StringRedisTemplate redisTemplate;
 
     @Override
     public RecordResponse.RankDto registerRecord(RecordRequest.RegisterDto registerDto) {
@@ -29,6 +33,7 @@ public class RecordServiceRdbmsImpl implements RecordService {
         Record saved = recordRepository.save(record);
 
         recordRepository.flush();
+        redisTemplate.opsForZSet().add(RECORD_KEY, saved.getName(), saved.getAverageTime());
 
         return toResponse(recordRepository.findRankingById(saved.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.ENTITY_NOT_FOUND)));

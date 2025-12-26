@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+import static com.simulation.reactgame.infra.RedisRecordKey.RECORD_KEY;
+
 @Slf4j
 @Service
 @Transactional
@@ -29,7 +31,6 @@ public class RecordServiceRedisImpl implements RecordService, RedisRecordService
 
     private final RecordRepository recordRepository;
     private final StringRedisTemplate redisTemplate;
-    private static final String RECORD_KEY = RedisRecordKey.RECORD_KEY;
 
     @Override
     public RecordResponse.RankDto registerRecord(RecordRequest.RegisterDto registerDto) {

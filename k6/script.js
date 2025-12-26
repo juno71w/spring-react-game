@@ -5,13 +5,15 @@ import { uuidv4 } from 'https://jslib.k6.io/k6-utils/1.4.0/index.js';
 // 1. 테스트 설정: VUs를 1부터 점진적으로 늘리는 'Ramping' 구조
 export const options = {
     stages: [
-        { duration: '30s', target: 10 }, // 30초 동안 VU를 1에서 20까지 증가
-        { duration: '1m', target: 10 },  // 1분 동안 20 VU 유지
-        { duration: '20s', target: 0 },  // 마지막 20초 동안 VU를 0으로 감소 (정리)
+        { duration: '1m', target: 500 }, // 1분 동안 VU를 1에서 500까지 증가
+        { duration: '1m', target: 700 },  // 1분 동안 VU를 500에서 700까지 증가
+        { duration: '1m', target: 900 },  // 1분 동안 VU를 700에서 900까지 증가
+        { duration: '1m', target: 1000 },  // 1분 동안 VU를 900에서 1000까지 증가
+        { duration: '1m', target: 0 },  // 마지막 20초 동안 VU를 0으로 감소 (정리)
     ],
 };
 
-const BASE_URL = 'http://3.39.50.141:8080/api/v1';
+const BASE_URL = 'http://3.39.50.141:8080/api/v2';
 // const BASE_URL = 'http://host.docker.internal:8080/api/v2';
 const testDate = Date.now();
 

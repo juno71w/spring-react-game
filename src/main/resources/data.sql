@@ -1,9 +1,9 @@
-SET SESSION cte_max_recursion_depth = 100000;
+SET SESSION cte_max_recursion_depth = 200000;
 INSERT INTO `records` (created_at, updated_at, attempt1, attempt2, attempt3, average_time, name)
 WITH RECURSIVE t AS (
     SELECT 1 AS n
     UNION ALL
-    SELECT n + 1 FROM t WHERE n < 100000
+    SELECT n + 1 FROM t WHERE n < 200000
 )
 SELECT
     NOW(6),
