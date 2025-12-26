@@ -18,7 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,41 +42,43 @@ public class RecordServiceRedisImpl implements RecordService, RedisRecordService
         redisTemplate.opsForZSet().add(RECORD_KEY, saved.getName(), saved.getAverageTime());
         Long rank = redisTemplate.opsForZSet().rank(RECORD_KEY, saved.getName());
 
-        return toResponse(saved, rank);
+        return toResponse(saved, rank + 1);
     }
 
     @Override
     public RecordResponse.RankList getRecords() {
-        List<String> nameList = redisTemplate.opsForZSet().reverseRangeWithScores(RECORD_KEY, 0, 9).stream()
-                .map(ZSetOperations.TypedTuple::getValue)
-                .toList();
+        Set<String> names = redisTemplate.opsForZSet().range(RECORD_KEY, 0, 9);
+        long[] currentRank = { 1 };
 
         return RecordResponse.RankList.builder()
                 .rankList(
-                        recordRepository.findRecordsByNameIn(nameList).stream()
+                        recordRepository.findRecordsByNameIn(names != null ? names : Collections.emptySet()).stream()
                                 .sorted(Comparator.comparingDouble(Record::getAverageTime))
-                                .map(record -> toResponse(record, 0))
+                                .map(record -> toResponse(record, currentRank[0]++))
                                 .toList())
                 .build();
     }
 
     @Override
     public RecordResponse.RankList getMyRecords(String name) {
-        Long rank = redisTemplate.opsForZSet().reverseRank(RECORD_KEY, name);
+        Long rank = redisTemplate.opsForZSet().rank(RECORD_KEY, name);
         Long size = redisTemplate.opsForZSet().size(RECORD_KEY); // O(1)
 
         long start = Math.max(rank - 5, 0);
         long end = Math.min(rank + 5, size - 1);
 
-        Set<String> nameSet = redisTemplate.opsForZSet().reverseRange(RECORD_KEY, start, end);
+        Set<String> nameSet = redisTemplate.opsForZSet().range(RECORD_KEY, start, end);
 
         // get record and sorting
-        List<Record> recordsByNameIn = recordRepository.findRecordsByNameIn(nameSet);
+        List<Record> recordsByNameIn = recordRepository
+                .findRecordsByNameIn(nameSet != null ? nameSet : Collections.emptySet());
         recordsByNameIn.sort(Comparator.comparingDouble(Record::getAverageTime));
+
+        long[] currentRank = { start + 1 };
 
         return RecordResponse.RankList.builder()
                 .rankList(recordsByNameIn.stream()
-                        .map(record -> toResponse(record, 0))
+                        .map(record -> toResponse(record, currentRank[0]++))
                         .toList())
                 .build();
     }
@@ -95,6 +97,7 @@ public class RecordServiceRedisImpl implements RecordService, RedisRecordService
                 .id(record.getId())
                 .name(record.getName())
                 .score(record.getAverageTime())
+                .rank(rank)
                 .build();
     }
 
