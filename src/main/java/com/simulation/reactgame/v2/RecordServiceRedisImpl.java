@@ -1,13 +1,10 @@
 package com.simulation.reactgame.v2;
 
-import com.simulation.global.error.CustomException;
-import com.simulation.global.error.ErrorCode;
-import com.simulation.reactgame.RecordRankingView;
 import com.simulation.reactgame.dto.RecordRequest;
 import com.simulation.reactgame.dto.RecordResponse;
-import com.simulation.reactgame.RecordRepository;
-import com.simulation.reactgame.RecordService;
-import com.simulation.reactgame.RedisRecordService;
+import com.simulation.reactgame.repository.RecordRepository;
+import com.simulation.reactgame.service.RecordService;
+import com.simulation.reactgame.service.RedisRecordService;
 import com.simulation.reactgame.entity.Record;
 import com.simulation.reactgame.infra.RedisRecordKey;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 

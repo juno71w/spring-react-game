@@ -2,16 +2,18 @@ package com.simulation.reactgame.v1;
 
 import com.simulation.global.error.CustomException;
 import com.simulation.global.error.ErrorCode;
-import com.simulation.reactgame.RecordRankingView;
+import com.simulation.reactgame.repository.RecordRankingView;
 import com.simulation.reactgame.dto.RecordRequest;
 import com.simulation.reactgame.dto.RecordResponse;
-import com.simulation.reactgame.RecordRepository;
-import com.simulation.reactgame.RecordService;
+import com.simulation.reactgame.repository.RecordRepository;
+import com.simulation.reactgame.service.RecordService;
 import com.simulation.reactgame.entity.Record;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Comparator;
 
 @Service
 @Transactional
@@ -51,6 +53,7 @@ public class RecordServiceRdbmsImpl implements RecordService {
                         recordRepository.findRecordNearByMe10(name)
                                 .stream()
                                 .map(this::toResponse)
+                                .sorted(Comparator.comparing(RecordResponse.RankDto::getRank))
                                 .toList()
                 )
                 .build();

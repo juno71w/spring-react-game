@@ -44,7 +44,8 @@ public class Record extends BaseTimeEntity {
     }
 
     private float calculateAverageTime() {
-        return (attempt1 + attempt2 + attempt3) / 3;
+        float num = (attempt1 + attempt2 + attempt3) / 3;
+        return (float) (Math.round(num * 1000) / 1000.0);
     }
 
     private void validate(String name, float... attempts) {

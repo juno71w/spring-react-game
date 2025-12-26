@@ -1,11 +1,8 @@
-package com.simulation.global.config;
+package com.simulation.global.runner;
 
-import com.simulation.reactgame.RecordService;
-import com.simulation.reactgame.RedisRecordService;
+import com.simulation.reactgame.service.RedisRecordService;
 import com.simulation.reactgame.infra.RedisRecordKey;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -26,14 +23,12 @@ public class RankingWarmUp {
         this.recordService = recordService;
     }
 
-    @PostConstruct
     public void warmUp() {
-        log.info("redis check key");
-        Boolean exists = redisTemplate.hasKey(RANKING_KEY);
-        if (Boolean.FALSE.equals(exists)) {
-            log.info("redis warm up start");
-            recordService.rebuildRanking();
-        }
+        redisTemplate.delete(RANKING_KEY);
+
+        log.info("redis warm up start");
+        recordService.rebuildRanking();
+
         log.info("redis warm up finish");
     }
 }

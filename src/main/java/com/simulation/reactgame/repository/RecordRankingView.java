@@ -1,4 +1,4 @@
-package com.simulation.reactgame;
+package com.simulation.reactgame.repository;
 
 public interface RecordRankingView {
     Long getId();

@@ -16,5 +16,5 @@ SELECT
 FROM t;
 
 -- 만약 average_time을 세 시도의 평균으로 맞추고 싶다면?
-UPDATE records SET average_time = (attempt1 + attempt2 + attempt3) / 3
+UPDATE records SET average_time = ROUND((attempt1 + attempt2 + attempt3) / 3, 2)
 WHERE average_time = 0;

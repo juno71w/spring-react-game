@@ -1,4 +1,4 @@
-package com.simulation.reactgame;
+package com.simulation.reactgame.service;
 
 public interface RedisRecordService {
     void rebuildRanking();

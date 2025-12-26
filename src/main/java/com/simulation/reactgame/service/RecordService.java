@@ -1,4 +1,4 @@
-package com.simulation.reactgame;
+package com.simulation.reactgame.service;
 
 import com.simulation.reactgame.dto.RecordRequest;
 import com.simulation.reactgame.dto.RecordResponse;

@@ -12,14 +12,11 @@ spring:
       port: 6379
       database: 0
       timeout: 2000ms
-  sql:
-    init:
-      mode: never
 
   jpa:
     defer-datasource-initialization: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     properties:
       hibernate:
         format_sql: true

@@ -1,9 +1,8 @@
 package com.simulation.reactgame.v1;
 
-import com.simulation.reactgame.RecordRankingView;
 import com.simulation.reactgame.dto.RecordRequest;
 import com.simulation.reactgame.dto.RecordResponse;
-import com.simulation.reactgame.RecordService;
+import com.simulation.reactgame.service.RecordService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
