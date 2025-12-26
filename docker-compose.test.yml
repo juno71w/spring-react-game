@@ -4,5 +4,10 @@ services:
     volumes:
       - ./k6:/scripts
     environment:
+#      - K6_OUT=influxdb=http://influxdb:8086/k6
       - K6_OUT=influxdb=http://3.39.50.141:8086/k6
+    networks:
+      - monitoring
 
+networks:
+  monitoring:
