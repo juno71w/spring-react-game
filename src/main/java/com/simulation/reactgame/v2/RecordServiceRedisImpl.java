@@ -100,11 +100,11 @@ public class RecordServiceRedisImpl implements RecordService, RedisRecordService
     @Override
     public void rebuildRanking() {
         int page = 0;
-        int size = 1000;
+        int size = 10_000;
 
         redisTemplate.delete(RECORD_KEY);
 
-        log.info("redis rebuildRanking");
+        log.info("redis rebuildRanking page size: {}", size);
         while (true) {
             Page<Record> result = recordRepository.findAll(PageRequest.of(page, size));
             log.info("redis warm page: {}", page);

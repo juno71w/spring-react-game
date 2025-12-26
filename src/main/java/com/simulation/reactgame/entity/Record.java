@@ -54,7 +54,7 @@ public class Record extends BaseTimeEntity {
         }
 
         for (float attempt : attempts) {
-            if (attempt <= 0) {
+            if (attempt < 0) {
                 throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
             }
         }
