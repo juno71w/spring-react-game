@@ -31,7 +31,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins(
                         "http://localhost:3000",
                         "http://localhost:5173",
-                        "https://react-game-*.vercel.app" // Vercel 배포 도메인 패턴 추가
+                        "https://react-game-*.vercel.app", // Vercel 배포 도메인 패턴 추가
+                        "https://juno712.dev"
                 )
                 .allowedMethods(
                         "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
