@@ -1,5 +1,7 @@
 package com.simulation.reactgame.v1;
 
+import com.simulation.global.error.CustomException;
+import com.simulation.global.error.ErrorCode;
 import com.simulation.reactgame.RecordRankingView;
 import com.simulation.reactgame.dto.RecordRequest;
 import com.simulation.reactgame.dto.RecordResponse;
@@ -20,14 +22,14 @@ public class RecordServiceRdbmsImpl implements RecordService {
     private final RecordRepository recordRepository;
 
     @Override
-    public RecordResponse.RankDto registerRecord(RecordRequest.RegisterDto registerDto) {
+    public RecordRankingView registerRecord(RecordRequest.RegisterDto registerDto) {
         Record record = toEntity(registerDto);
         Record saved = recordRepository.save(record);
 
         recordRepository.flush();
 
-
-        return toResponse(saved);
+        return recordRepository.findRankingById(saved.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.ENTITY_NOT_FOUND));
     }
 
     @Override
@@ -73,4 +75,3 @@ public class RecordServiceRdbmsImpl implements RecordService {
     }
 
 }
-

@@ -1,5 +1,6 @@
 package com.simulation.reactgame.v1;
 
+import com.simulation.reactgame.RecordRankingView;
 import com.simulation.reactgame.dto.RecordRequest;
 import com.simulation.reactgame.dto.RecordResponse;
 import com.simulation.reactgame.RecordService;
@@ -18,12 +19,10 @@ public class RecordControllerV1 {
     }
 
     @PostMapping
-    public ResponseEntity<RecordResponse.RankDto> registerRecord(
-            @RequestBody RecordRequest.RegisterDto registerDto
-    ) {
-        RecordResponse.RankDto rankDto = recordService.registerRecord(registerDto);
-        return ResponseEntity.ofNullable(rankDto);
-
+    public ResponseEntity<RecordRankingView> registerRecord(
+            @RequestBody RecordRequest.RegisterDto registerDto) {
+        RecordRankingView view = recordService.registerRecord(registerDto);
+        return ResponseEntity.ofNullable(view);
     }
 
     @GetMapping
@@ -34,8 +33,7 @@ public class RecordControllerV1 {
 
     @GetMapping("/me")
     public ResponseEntity<RecordResponse.RankList> getMyRecords(
-            @RequestParam String name
-    ) {
+            @RequestParam String name) {
         RecordResponse.RankList list = recordService.getMyRecords(name);
         return ResponseEntity.ofNullable(list);
     }

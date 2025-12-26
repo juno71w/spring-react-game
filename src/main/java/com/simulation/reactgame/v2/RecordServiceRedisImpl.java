@@ -31,11 +31,14 @@ public class RecordServiceRedisImpl implements RecordService, RedisRecordService
     private static final String RECORD_KEY = RedisRecordKey.RECORD_KEY;
 
     @Override
-    public RecordResponse.RankDto registerRecord(RecordRequest.RegisterDto registerDto) {
+    public com.simulation.reactgame.RecordRankingView registerRecord(RecordRequest.RegisterDto registerDto) {
         Record saved = recordRepository.save(toEntity(registerDto));
 
         redisTemplate.opsForZSet().add(RECORD_KEY, saved.getName(), saved.getAverageTime());
-        return toResponse(saved);
+
+        return recordRepository.findRankingById(saved.getId())
+                .orElseThrow(() -> new com.simulation.global.error.CustomException(
+                        com.simulation.global.error.ErrorCode.ENTITY_NOT_FOUND));
     }
 
     @Override
@@ -49,8 +52,7 @@ public class RecordServiceRedisImpl implements RecordService, RedisRecordService
                         recordRepository.findRecordsByNameIn(nameList).stream()
                                 .sorted(Comparator.comparingDouble(Record::getAverageTime))
                                 .map(this::toResponse)
-                                .toList()
-                )
+                                .toList())
                 .build();
     }
 
@@ -71,8 +73,7 @@ public class RecordServiceRedisImpl implements RecordService, RedisRecordService
         return RecordResponse.RankList.builder()
                 .rankList(recordsByNameIn.stream()
                         .map(this::toResponse)
-                        .toList()
-                )
+                        .toList())
                 .build();
     }
 
@@ -104,7 +105,8 @@ public class RecordServiceRedisImpl implements RecordService, RedisRecordService
         while (true) {
             Page<Record> result = recordRepository.findAll(PageRequest.of(page, size));
             log.info("redis warm page: {}", page);
-            if (result.isEmpty()) break;
+            if (result.isEmpty())
+                break;
 
             redisTemplate.executePipelined(getObjectRedisCallback(result));
 
@@ -120,13 +122,11 @@ public class RecordServiceRedisImpl implements RecordService, RedisRecordService
                 connection.zAdd(
                         key,
                         record.getAverageTime(),
-                        serialize(record.getName())
-                );
+                        serialize(record.getName()));
             }
             return null;
         };
     }
-
 
     private byte[] serialize(String key) {
         return redisTemplate.getStringSerializer().serialize(key);
