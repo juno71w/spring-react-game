@@ -13,4 +13,4 @@ Content-Type: application/json
 GET http://localhost:8080/api/v1/records
 
 ### 내 이름으로 랭킹 조회 + 랭킹 근처 10명 조회
-GET http://localhost:8080/api/v1/records/me?name=User_1
+GET http://localhost:8080/api/v1/records/me?name=User_100000

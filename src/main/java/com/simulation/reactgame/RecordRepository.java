@@ -19,7 +19,7 @@ public interface RecordRepository extends JpaRepository<com.simulation.reactgame
                 id,
                 name,
                 average_time,
-                RANK() OVER (ORDER BY average_time ASC) AS rank
+                RANK() OVER (ORDER BY average_time ASC) AS `rank`
             FROM records
             ORDER BY average_time ASC
             LIMIT 10
@@ -28,7 +28,7 @@ public interface RecordRepository extends JpaRepository<com.simulation.reactgame
 
     @Query(value = """
             SELECT *,
-                   RANK() OVER (ORDER BY average_time ASC) AS rank
+                   RANK() OVER (ORDER BY average_time ASC) AS `rank`
             FROM (
                 (SELECT * FROM records
                  WHERE average_time > (SELECT average_time FROM records WHERE name = :name)
@@ -62,16 +62,16 @@ public interface RecordRepository extends JpaRepository<com.simulation.reactgame
                 id,
                 name,
                 average_time,
-                RANK() OVER (ORDER BY average_time ASC) AS rank
+                RANK() OVER (ORDER BY average_time ASC) AS `rank`
             FROM records
             WHERE id = :recordId
             """, nativeQuery = true)
     RecordResponse.RankDto findRankByRecordId(@Param("recordId") Long recordId);
 
     @Query(value = """
-            SELECT sub.id, sub.name, sub.average_time, sub.rank
+            SELECT sub.id, sub.name, sub.average_time, sub.`rank`
             FROM (
-                SELECT id, name, average_time, RANK() OVER (ORDER BY average_time ASC) as rank
+                SELECT id, name, average_time, RANK() OVER (ORDER BY average_time ASC) as `rank`
                 FROM records
             ) sub
             WHERE sub.id = :recordId
