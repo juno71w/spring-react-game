@@ -26,19 +26,19 @@ public interface RecordRepository extends JpaRepository<Record, Long> {
     List<RecordRankingView> findTop10Ranking();
 
     @Query(value = """
-    WITH RankedRecords AS (
-        /* 1. 모든 레코드에 대해 먼저 순위를 매깁니다. */
-        SELECT id, name, average_time, 
-               ROW_NUMBER() OVER (ORDER BY average_time ASC, name ASC) AS `rank`
-        FROM records
-    )
-    SELECT id, name, average_time, `rank`
-    FROM RankedRecords
-    WHERE `rank` BETWEEN 
-        (SELECT `rank` FROM RankedRecords WHERE name = :name) - 5 
-        AND 
-        (SELECT `rank` FROM RankedRecords WHERE name = :name) + 5
-    ORDER BY `rank` ASC
+        WITH RankedRecords AS (
+            /* 1. 모든 레코드에 대해 먼저 순위를 매깁니다. */
+            SELECT id, name, average_time, 
+                   ROW_NUMBER() OVER (ORDER BY average_time ASC, name ASC) AS `rank`
+            FROM records
+        )
+        SELECT id, name, average_time, `rank`
+        FROM RankedRecords
+        WHERE `rank` BETWEEN 
+            (SELECT `rank` FROM RankedRecords WHERE name = :name) - 5 
+            AND 
+            (SELECT `rank` FROM RankedRecords WHERE name = :name) + 5
+        ORDER BY `rank` ASC
     """, nativeQuery = true)
     List<RecordRankingView> findRecordNearByMe10(@Param("name") String name);
 
